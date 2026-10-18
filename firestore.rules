@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// ============================================================================
+// REGLAS DE SEGURIDAD (se ejecutan en los servidores de Google)
+// Nadie puede saltearlas desde el navegador, aunque modifique el JavaScript.
+// ============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Funciones auxiliares ----
+    function logueado() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function perfilDe(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+    function esAprobado() {
+      return logueado() && perfilDe(request.auth.uid).estado == 'aprobado';
+    }
+    function esAdmin() {
+      return esAprobado() && perfilDe(request.auth.uid).rol == 'admin';
+    }
+    function textoValido(valor, max) {
+      return valor is string && valor.size() > 0 && valor.size() <= max;
+    }
+    function accesibilidadValida(valor) {
+      return valor in ['ninguna', 'visual', 'auditiva'];
+    }
+
+    // ---- Perfiles de usuario ----
+    match /users/{uid} {
+
+      // Cada usuario lee solo su propio perfil; el admin puede leer todos
+      allow get: if logueado() && (request.auth.uid == uid || esAdmin());
+      allow list: if esAdmin();
+
+      // Alta: solo el propio usuario, siempre como "pendiente" y "miembro"
+      allow create: if logueado()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(
+             ['nombre', 'apellido', 'email', 'fechaNacimiento', 'accesibilidad', 'estado', 'rol', 'creado'])
+        && textoValido(request.resource.data.nombre, 60)
+        && textoValido(request.resource.data.apellido, 60)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.fechaNacimiento is string
+        && request.resource.data.fechaNacimiento.size() == 10
+        && accesibilidadValida(request.resource.data.accesibilidad)
+        && request.resource.data.estado == 'pendiente'
+        && request.resource.data.rol == 'miembro'
+        && request.resource.data.creado == request.time;
+
+      // Edición: el usuario solo puede cambiar su accesibilidad (nunca estado ni rol);
+      // el admin solo puede cambiar estado y rol de otros.
+      allow update: if logueado() && (
+        (request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accesibilidad'])
+          && accesibilidadValida(request.resource.data.accesibilidad))
+        ||
+        (esAdmin()
+          && request.auth.uid != uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'rol'])
+          && request.resource.data.estado in ['pendiente', 'aprobado', 'bloqueado']
+          && request.resource.data.rol in ['miembro', 'admin'])
+      );
+
+      allow delete: if false;
+    }
+
+    // ---- Contenido privado: solo lo leen usuarios aprobados, solo lo edita un admin ----
+    match /contenido_privado/{docId} {
+      allow read: if esAprobado();
+      allow write: if esAdmin();
+    }
+
+    // ---- Todo lo demás está prohibido ----
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,37 @@
+/* ==========================================================================
+   ACCESIBILIDAD: modo alto contraste (se activa con body.alto-contraste)
+   ========================================================================== */
+body.alto-contraste { background-color: #121212; color: #ffffff; }
+
+body.alto-contraste .content-card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+body.alto-contraste .content-card h1,
+body.alto-contraste .content-card h2 { color: #00ddff; }
+body.alto-contraste .content-card p  { color: #ffffff; }
+
+body.alto-contraste .technical-box {
+    background-color: #2d2d2d;
+    border-left-color: #00ddff;
+    color: #ffffff;
+}
+body.alto-contraste .doc-item,
+body.alto-contraste .fila-usuario {
+    background: #2d2d2d;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+body.alto-contraste .doc-item a { color: #00ddff; }
+body.alto-contraste input,
+body.alto-contraste select {
+    background: #2d2d2d;
+    color: white;
+    border: 1px solid white;
+}
+body.alto-contraste .nota-chica { color: #cccccc; }
+body.alto-contraste .aviso-error { color: #ff8a80; }
+
+/* Foco visible para navegación con teclado */
+:focus-visible { outline: 3px solid #ffbf47; outline-offset: 2px; }

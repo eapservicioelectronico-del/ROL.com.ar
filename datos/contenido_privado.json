@@ -1,0 +1,29 @@
+{
+  "manuales": {
+    "titulo": "Manuales y Documentación",
+    "intro": "Espacio de consulta exclusivo para miembros aprobados. Guías prácticas operativas y documentación técnica.",
+    "secciones": [
+      {
+        "titulo": "1. Manuales de Operación",
+        "items": [
+          { "texto": "Guía de Inicio Rápido y Dinámicas de Integración", "url": "" },
+          { "texto": "Procedimientos de Organización y Uso del Espacio Común", "url": "" }
+        ]
+      },
+      {
+        "titulo": "2. Documentación Técnica del Sistema",
+        "items": [
+          { "texto": "Hojas de Datos (Datasheets) y Esquemas de Conexión", "url": "" },
+          { "texto": "Diagramas de Procesos e Informes Técnicos de Respaldo", "url": "" }
+        ]
+      }
+    ]
+  },
+  "aplicaciones": {
+    "titulo": "Aplicaciones Privadas",
+    "intro": "Utilitarios digitales interactivos desarrollados a medida para nuestras actividades.",
+    "items": [
+      { "texto": "Próximamente: agregá acá tus aplicaciones (con url https://...)", "url": "" }
+    ]
+  }
+}
